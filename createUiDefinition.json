@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/0.1.2-preview/CreateUIDefinition.MultiVm.json#",
+  "handler": "Microsoft.Azure.CreateUIDef",
+  "version": "0.0.1-preview",
+  "parameters": {
+    "basics": [ ],
+    "steps": [
+      {
+        "name": "applicationSettings",
+        "label": "Application Settings",
+        "subLabel": {
+          "preValidation": "Configure your application settings",
+          "postValidation": "Done"
+        },
+        "bladeTitle": "Application Settings",
+        "elements": [
+          {
+            "name": "appName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "Managed application Name",
+            "toolTip": "Managed application instance name",
+            "visible": true
+          },
+          {
+            "name": "appIdentity",
+            "type": "Microsoft.ManagedIdentity.IdentitySelector",
+            "label": "Managed Identity Configuration",
+            "toolTip": {
+              "systemAssignedIdentity": "Enable system assigned identity to grant the managed application access to additional existing resources.",
+              "userAssignedIdentity": "Add user assigned identities to grant the managed application access to additional existing resources."
+            },
+            "defaultValue": {
+              "systemAssignedIdentity": "Off"
+            },
+            "options": {
+              "hideSystemAssignedIdentity": false,
+              "hideUserAssignedIdentity": false,
+              "readOnlySystemAssignedIdentity": false
+            },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "name": "keysforapp",
+        "label": "KeyVault key Settings",
+        "bladeTitle": "KeyVault key Settings",
+        "elements": [
+          {
+            "name": "kvName",
+            "type": "Microsoft.Common.TextBox",
+            "label": "KV name",
+            "toolTip": "The name of the kv.",
+            "defaultValue": "kvname",
+            "constraints": {
+                "required": true,
+                "regex": "^[a-z0-9A-Z-]{3,79}$",
+                "validationMessage": "The Name must be between 3 and 79 characters long and contain letters, numbers and hyphens only."
+            }
+          },
+        {
+          "name": "cmkKeyName",
+          "type": "Microsoft.Common.TextBox",
+          "label": "Key Name",
+          "toolTip": "Enter the name of the key in key vault.",
+          "constraints": {
+              "required": false,
+              "regex": "^[a-zA-Z0-9-]{1,63}$",
+              "validationMessage": "Key names can only contain alphanumeric characters and dashes."
+          },
+          "visible": "[steps('storageConfig').useCmk]"
+      }
+      ]
+    }
+    ],
+    "outputs": {
+      "applicationResourceName": "[steps('applicationSettings').appName]",
+      "location": "[location()]",
+      "managedIdentity": "[steps('applicationSettings').appIdentity]",
+      "vaultName": "[steps('keysforapp').kvName]", 
+      "keyName": "[steps('keysforapp').cmkKeyName]"
+    }
+  }
+}
